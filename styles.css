@@ -52,7 +52,6 @@ h2 {
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
     margin-bottom: 2.5rem;
     transition: all 0.3s ease;
-    overflow: hidden;
 }
 
 #heatmap {
@@ -64,6 +63,7 @@ h2 {
 
 #heatmap svg {
     min-width: 1000px;
+    min-height: 1000px;
 }
 
 #legend {
@@ -107,9 +107,15 @@ h2 {
 }
 
 .axis-label {
-    font-family: var(--sf-pro);
-    fill: var(--text-color);
     font-size: 12px;
+    font-weight: 500;
+    fill: var(--text-color);
+    cursor: default;
+}
+
+/* Add tooltip styles for truncated text */
+.axis-label:hover {
+    fill: var(--moniepoint-blue);
 }
 
 .relationship-item {
@@ -375,12 +381,4 @@ h2 {
 /* Update relationship item styling */
 .relationship-item strong {
     color: var(--moniepoint-blue);
-}
-
-/* Add horizontal scrolling for smaller screens */
-@media screen and (max-width: 1200px) {
-    #heatmap {
-        overflow-x: auto;
-        overflow-y: auto;
-    }
 } 

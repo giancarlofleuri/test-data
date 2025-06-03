@@ -1,5 +1,5 @@
 // Fetch and process the data
-fetch('data/card_cooccurrence_matrix.csv')
+fetch('card_cooccurrence_matrix.csv')
     .then(response => response.text())
     .then(data => {
         const parsedData = d3.csvParse(data);
@@ -19,14 +19,11 @@ fetch('data/card_cooccurrence_matrix.csv')
         createHeatmap(matrix, cards);
         updateStatistics(matrix, cards);
         updateRelationships(matrix, cards);
-    })
-    .catch(error => {
-        console.error('Error loading the data:', error);
-        document.getElementById('heatmap').innerHTML = 'Error loading the visualization data. Please check the console for details.';
     });
 
 function createHeatmap(matrix, cards) {
-    const margin = { top: 120, right: 50, bottom: 100, left: 250 };
+    // Increase left margin to accommodate longer labels
+    const margin = { top: 120, right: 50, bottom: 100, left: 200 };
     const width = 1000 - margin.left - margin.right;
     const height = 1000 - margin.top - margin.bottom;
 
@@ -95,7 +92,7 @@ function createHeatmap(matrix, cards) {
                 .style("opacity", 0);
         });
 
-    // Add row labels with adjusted positioning
+    // Update row labels with text wrapping
     svg.selectAll()
         .data(cards)
         .enter()
@@ -105,10 +102,16 @@ function createHeatmap(matrix, cards) {
         .attr("y", (d, i) => i * cellSize + cellSize / 2)
         .style("text-anchor", "end")
         .style("alignment-baseline", "middle")
-        .style("font-size", "12px")
+        .text(d => {
+            if (d.length > 25) {
+                return d.substring(0, 22) + '...';
+            }
+            return d;
+        })
+        .append("title") // Add tooltip for full text
         .text(d => d);
 
-    // Add column labels with adjusted positioning
+    // Update column labels with text wrapping
     svg.selectAll()
         .data(cards)
         .enter()
@@ -117,8 +120,14 @@ function createHeatmap(matrix, cards) {
         .attr("x", (d, i) => i * cellSize + cellSize / 2)
         .attr("y", -10)
         .style("text-anchor", "start")
-        .style("font-size", "12px")
         .attr("transform", (d, i) => `rotate(-45, ${i * cellSize + cellSize / 2}, -10)`)
+        .text(d => {
+            if (d.length > 25) {
+                return d.substring(0, 22) + '...';
+            }
+            return d;
+        })
+        .append("title") // Add tooltip for full text
         .text(d => d);
 
     // Add legend
