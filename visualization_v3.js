@@ -33,7 +33,8 @@ function createHeatmap(matrix, cards) {
 
     // Calculate label positioning
     const labelAngle = -35; // Less steep angle
-    const labelOffset = 8;  // Gap between label and cell
+    const labelOffset = 12;  // Increased gap between label and cell
+    const labelPadding = 8; // Additional padding for labels
 
     // Remove existing SVG
     d3.select("#heatmap svg").remove();
@@ -43,17 +44,18 @@ function createHeatmap(matrix, cards) {
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom);
 
-    // Add title at the top
+    // Add title at the top with more spacing
     svg.append("text")
         .attr("x", (width + margin.left + margin.right) / 2)
-        .attr("y", 30)
+        .attr("y", 40)
         .attr("text-anchor", "middle")
         .style("font-size", "16px")
+        .style("font-weight", "500")
         .style("fill", "#333")
         .text("Co-occurrence Strength");
 
     const mainGroup = svg.append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`);
+        .attr("transform", `translate(${margin.left},${margin.top + labelPadding})`);
 
     // Create color scale using lighter blues
     const colorScale = d3.scaleSequential()
@@ -80,6 +82,7 @@ function createHeatmap(matrix, cards) {
         })
         .style("text-anchor", "end")
         .style("font-size", "11px")
+        .style("font-weight", "400")
         .style("fill", "#333")
         .text(d => d);
 
@@ -90,11 +93,12 @@ function createHeatmap(matrix, cards) {
         .data(cards)
         .enter()
         .append("text")
-        .attr("x", -10)
+        .attr("x", -labelPadding - 10)
         .attr("y", (d, i) => i * cellSize + cellSize / 2)
         .style("text-anchor", "end")
         .style("dominant-baseline", "middle")
         .style("font-size", "11px")
+        .style("font-weight", "400")
         .style("fill", "#333")
         .text(d => d);
 

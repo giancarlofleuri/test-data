@@ -226,4 +226,15 @@ h2 {
 /* Update relationship item styling */
 .relationship-item strong {
     color: var(--moniepoint-blue);
+}
+
+.top-labels text {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    padding-bottom: 12px;
+    transform-origin: left bottom;
+}
+
+.side-labels text {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    padding-right: 8px;
 } 
