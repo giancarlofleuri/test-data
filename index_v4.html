@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Card Sorting Analysis Visualization for UX Research">
+    <meta name="theme-color" content="#0066CC">
+    <title>Card Sorting Analysis V4 - Business vs Personal Users</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .heatmap-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        #business-heatmap,
+        #personal-heatmap {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .stat-section,
+        .relationship-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .relationships-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .heatmap-container {
+                flex-direction: column;
+            }
+            
+            .relationships-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Card Sorting Analysis V4</h1>
+            <p class="subtitle">Business vs Personal Users • June 2025</p>
+        </header>
+
+        <main>
+            <section class="visualization">
+                <h2>Co-occurrence Analysis</h2>
+                <div class="heatmap-container">
+                    <div id="business-heatmap"></div>
+                    <div id="personal-heatmap"></div>
+                </div>
+            </section>
+
+            <section class="stats">
+                <h2>Key Statistics</h2>
+                <div id="statistics" aria-live="polite"></div>
+            </section>
+
+            <section class="relationships">
+                <h2>Relationship Analysis</h2>
+                <div id="relationships" aria-live="polite"></div>
+            </section>
+        </main>
+
+        <footer>
+            <p class="footnote">Data visualization created with D3.js • Last updated June 2025</p>
+        </footer>
+    </div>
+    <script src="visualization_v4.js"></script>
+</body>
+</html> 
