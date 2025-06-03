@@ -1,4 +1,5 @@
 // Load and process the data
+// Updated visualization with improved label positioning
 d3.csv('card_cooccurrence_matrix_v3.csv').then(function(data) {
     const cards = data.columns.slice(1); // Get card names from columns
     const matrix = [];
