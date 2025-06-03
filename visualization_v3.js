@@ -19,20 +19,20 @@ d3.csv('card_cooccurrence_matrix_v3.csv').then(function(data) {
 });
 
 function createHeatmap(matrix, cards) {
-    // Increase margins for better spacing
+    // Adjust margins for better spacing
     const margin = { 
-        top: 250,      // Increased for legend
-        right: 50,     // Reduced right margin
-        bottom: 50,    // Reduced since we don't need much space at bottom
-        left: 250 
+        top: 120,      // Reduced top margin
+        right: 50,     // Minimal right margin
+        bottom: 50,    // Minimal bottom margin
+        left: 200      // Space for left labels
     };
     const width = 1200 - margin.left - margin.right;
-    const height = 1000 - margin.top - margin.bottom;
+    const height = 800 - margin.top - margin.bottom;
     const cellSize = Math.min(width, height) / cards.length;
-    
-    // Calculate max label length for spacing
-    const maxLabelLength = Math.max(...cards.map(d => d.length));
-    const labelSpacing = maxLabelLength * 7; // Adjust spacing based on text length
+
+    // Calculate label positioning
+    const labelAngle = -35; // Less steep angle
+    const labelOffset = 8;  // Gap between label and cell
 
     // Remove existing SVG
     d3.select("#heatmap svg").remove();
@@ -40,70 +40,27 @@ function createHeatmap(matrix, cards) {
     const svg = d3.select("#heatmap")
         .append("svg")
         .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
+        .attr("height", height + margin.top + margin.bottom);
+
+    // Add title at the top
+    svg.append("text")
+        .attr("x", (width + margin.left + margin.right) / 2)
+        .attr("y", 30)
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("fill", "#333")
+        .text("Co-occurrence Strength");
+
+    const mainGroup = svg.append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Create color scale using MoniePoint blues
+    // Create color scale using lighter blues
     const colorScale = d3.scaleSequential()
         .domain([0, d3.max(matrix, d => d3.max(d, v => v.value))])
-        .interpolator(d3.interpolateHsl("#ffffff", "#0066CC"));
-
-    // Add legend at the top
-    const legendWidth = 300;
-    const legendHeight = 20;
-    
-    const legendScale = d3.scaleLinear()
-        .domain([0, d3.max(matrix, d => d3.max(d, v => v.value))])
-        .range([0, legendWidth]);
-    
-    const legendAxis = d3.axisBottom(legendScale)
-        .ticks(5)
-        .tickFormat(d => d.toFixed(0));
-    
-    const legend = svg.append("g")
-        .attr("class", "legend")
-        .attr("transform", `translate(${(width - legendWidth) / 2}, ${-180})`);
-    
-    legend.append("text")
-        .attr("x", legendWidth / 2)
-        .attr("y", -20)
-        .style("text-anchor", "middle")
-        .style("font-size", "14px")
-        .style("font-weight", "500")
-        .text("Co-occurrence Strength");
-    
-    const gradient = legend.append("defs")
-        .append("linearGradient")
-        .attr("id", "legend-gradient")
-        .attr("x1", "0%")
-        .attr("x2", "100%")
-        .attr("y1", "0%")
-        .attr("y2", "0%");
-    
-    gradient.append("stop")
-        .attr("offset", "0%")
-        .attr("stop-color", "#ffffff");
-    
-    gradient.append("stop")
-        .attr("offset", "100%")
-        .attr("stop-color", "#0066CC");
-    
-    legend.append("rect")
-        .attr("width", legendWidth)
-        .attr("height", legendHeight)
-        .style("fill", "url(#legend-gradient)")
-        .style("stroke", "#ccc")
-        .style("stroke-width", "1px");
-    
-    legend.append("g")
-        .attr("transform", `translate(0, ${legendHeight})`)
-        .call(legendAxis)
-        .selectAll("text")
-        .style("font-size", "12px");
+        .interpolator(d3.interpolateHsl("#f7f9fc", "#0066CC"));
 
     // Create a group for the heatmap
-    const heatmapGroup = svg.append("g")
+    const heatmapGroup = mainGroup.append("g")
         .attr("class", "heatmap-group");
 
     // Add x-axis labels with improved positioning
@@ -114,16 +71,14 @@ function createHeatmap(matrix, cards) {
         .enter()
         .append("text")
         .attr("x", (d, i) => i * cellSize + cellSize / 2)
-        .attr("y", -10)
+        .attr("y", -labelOffset)
         .attr("transform", (d, i) => {
             const x = i * cellSize + cellSize / 2;
-            const y = -10;
-            return `rotate(-45, ${x}, ${y})`;
+            const y = -labelOffset;
+            return `rotate(${labelAngle}, ${x}, ${y})`;
         })
         .style("text-anchor", "end")
-        .style("dominant-baseline", "middle")
-        .attr("class", "axis-label")
-        .style("font-size", "12px")
+        .style("font-size", "11px")
         .style("fill", "#333")
         .text(d => d);
 
@@ -134,44 +89,13 @@ function createHeatmap(matrix, cards) {
         .data(cards)
         .enter()
         .append("text")
-        .attr("x", -15)
+        .attr("x", -10)
         .attr("y", (d, i) => i * cellSize + cellSize / 2)
         .style("text-anchor", "end")
         .style("dominant-baseline", "middle")
-        .attr("class", "axis-label")
-        .style("font-size", "12px")
+        .style("font-size", "11px")
         .style("fill", "#333")
         .text(d => d);
-
-    // Add grid lines
-    const grid = heatmapGroup.append("g")
-        .attr("class", "grid");
-
-    // Vertical grid lines
-    grid.selectAll(".vertical")
-        .data(cards)
-        .enter()
-        .append("line")
-        .attr("class", "vertical")
-        .attr("x1", (d, i) => i * cellSize)
-        .attr("x2", (d, i) => i * cellSize)
-        .attr("y1", 0)
-        .attr("y2", height)
-        .style("stroke", "#eee")
-        .style("stroke-width", 1);
-
-    // Horizontal grid lines
-    grid.selectAll(".horizontal")
-        .data(cards)
-        .enter()
-        .append("line")
-        .attr("class", "horizontal")
-        .attr("x1", 0)
-        .attr("x2", width)
-        .attr("y1", (d, i) => i * cellSize)
-        .attr("y2", (d, i) => i * cellSize)
-        .style("stroke", "#eee")
-        .style("stroke-width", 1);
 
     // Create cells
     const rows = heatmapGroup.selectAll(".row")
@@ -190,14 +114,14 @@ function createHeatmap(matrix, cards) {
         .attr("width", cellSize)
         .attr("height", cellSize)
         .style("fill", d => colorScale(d.value))
-        .style("stroke", "#ffffff")
-        .style("stroke-width", "1px");
+        .style("stroke", "white")
+        .style("stroke-width", "0.5px");
 
     // Add hover effects and tooltips
     cells.on("mouseover", function(event, d) {
             const cell = d3.select(this);
             cell.style("stroke", "#0066CC")
-                .style("stroke-width", "2px");
+                .style("stroke-width", "1.5px");
             
             // Get the row and column indices
             const row = d3.select(this.parentNode).datum();
@@ -208,43 +132,40 @@ function createHeatmap(matrix, cards) {
             // Highlight corresponding labels
             topLabels.filter((d, i) => i === colIndex)
                 .style("fill", "#0066CC")
-                .style("font-weight", "bold");
+                .style("font-weight", "500");
             
             sideLabels.filter((d, i) => i === rowIndex)
                 .style("fill", "#0066CC")
-                .style("font-weight", "bold");
+                .style("font-weight", "500");
             
             // Create tooltip with improved styling
             const tooltip = d3.select("body").append("div")
                 .attr("class", "tooltip")
                 .style("position", "absolute")
                 .style("background", "white")
-                .style("padding", "12px")
-                .style("border", "1px solid #0066CC")
-                .style("border-radius", "8px")
-                .style("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
+                .style("padding", "8px 12px")
+                .style("border", "1px solid #ddd")
+                .style("border-radius", "4px")
+                .style("box-shadow", "0 1px 2px rgba(0,0,0,0.05)")
                 .style("pointer-events", "none")
-                .style("font-size", "14px")
+                .style("font-size", "12px")
                 .style("opacity", 0);
             
             tooltip.transition()
-                .duration(200)
+                .duration(150)
                 .style("opacity", .9);
             
             const tooltipContent = d.value > 0 ? `
-                <div style="margin-bottom: 8px;">
-                    <strong style="color: #0066CC">${cards[rowIndex]}</strong>
+                <div style="margin-bottom: 4px;">
+                    <strong style="color: #333">${cards[rowIndex]}</strong>
                     <span style="color: #666">↔</span>
-                    <strong style="color: #0066CC">${cards[colIndex]}</strong>
+                    <strong style="color: #333">${cards[colIndex]}</strong>
                 </div>
                 <div style="color: #666">
-                    Co-occurrences: <strong style="color: #000">${d.value}</strong>
-                </div>
-                <div style="font-size: 12px; color: #666; margin-top: 4px;">
-                    ${d.value > 4 ? 'Strong relationship' : d.value > 2 ? 'Moderate relationship' : 'Weak relationship'}
+                    Co-occurrences: <strong style="color: #333">${d.value}</strong>
                 </div>
             ` : `
-                <div style="color: #666">No relationship found</div>
+                <div style="color: #666">No relationship</div>
             `;
             
             tooltip.html(tooltipContent)
@@ -253,8 +174,8 @@ function createHeatmap(matrix, cards) {
         })
         .on("mouseout", function(event, d) {
             d3.select(this)
-                .style("stroke", "#ffffff")
-                .style("stroke-width", "1px");
+                .style("stroke", "white")
+                .style("stroke-width", "0.5px");
             
             // Reset label styles
             topLabels.style("fill", "#333")
@@ -275,8 +196,9 @@ function createHeatmap(matrix, cards) {
         .attr("y", cellSize / 2)
         .attr("dy", "0.35em")
         .style("text-anchor", "middle")
-        .style("fill", d => d.value > 4 ? "#ffffff" : "#000000")
-        .style("font-size", "12px")
+        .style("fill", d => d.value > 4 ? "#ffffff" : "#333")
+        .style("font-size", "11px")
+        .style("font-weight", "500")
         .text(d => d.value > 0 ? d.value : "");
 }
 
