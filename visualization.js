@@ -1,5 +1,5 @@
 // Fetch and process the data
-fetch('card_cooccurrence_matrix.csv')
+fetch('data/card_cooccurrence_matrix.csv')
     .then(response => response.text())
     .then(data => {
         const parsedData = d3.csvParse(data);
@@ -19,6 +19,10 @@ fetch('card_cooccurrence_matrix.csv')
         createHeatmap(matrix, cards);
         updateStatistics(matrix, cards);
         updateRelationships(matrix, cards);
+    })
+    .catch(error => {
+        console.error('Error loading the data:', error);
+        document.getElementById('heatmap').innerHTML = 'Error loading the visualization data. Please check the console for details.';
     });
 
 function createHeatmap(matrix, cards) {
